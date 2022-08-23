@@ -129,4 +129,19 @@ public interface DocTags {
      * custom @dubboRest tag
      */
     String DUBBO_REST = "dubboRest";
+
+    /**
+     * scan tag
+     */
+    String SCAN = "scan";
+
+    /**
+     * cup java param tag
+     */
+    String UPARAM = "uparam";
+
+    /**
+     * cup java param tag
+     */
+    String UPARAM_ANNO = "uparamAnno";
 }

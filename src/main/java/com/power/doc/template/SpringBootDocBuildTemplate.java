@@ -37,6 +37,7 @@ import com.power.doc.model.request.RequestMapping;
 import com.power.doc.utils.*;
 import com.thoughtworks.qdox.model.*;
 import com.thoughtworks.qdox.model.expression.AnnotationValue;
+import com.thoughtworks.qdox.model.impl.DefaultJavaMethod;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -56,7 +57,7 @@ import static com.power.doc.constants.DocTags.IGNORE_REQUEST_BODY_ADVICE;
  */
 public class SpringBootDocBuildTemplate implements IDocBuildTemplate<ApiDoc> {
 
-    private static Logger log = Logger.getLogger(SpringBootDocBuildTemplate.class.getName());
+    private static final Logger log = Logger.getLogger(SpringBootDocBuildTemplate.class.getName());
     /**
      * api index
      */
@@ -243,6 +244,8 @@ public class SpringBootDocBuildTemplate implements IDocBuildTemplate<ApiDoc> {
                 throw new RuntimeException("Unable to find comment for method " + method.getName() + " in " + cls.getCanonicalName());
             }
             ApiMethodDoc apiMethodDoc = new ApiMethodDoc();
+            // TODO: to put proper line location, maybe here
+            XDocBuildTemplateUtil.addParametersByAnnotation(method, projectBuilder);
             DocletTag downloadTag = method.getTagByName(DocTags.DOWNLOAD);
             if (Objects.nonNull(downloadTag)) {
                 apiMethodDoc.setDownload(true);
@@ -830,10 +833,7 @@ public class SpringBootDocBuildTemplate implements IDocBuildTemplate<ApiDoc> {
                 }
             }
             boolean required = Boolean.parseBoolean(strRequired);
-            boolean queryParam = false;
-            if (!isRequestBody && !isPathVariable) {
-                queryParam = true;
-            }
+            boolean queryParam = !isRequestBody && !isPathVariable;
             if (JavaClassValidateUtil.isCollection(fullTypeName) || JavaClassValidateUtil.isArray(fullTypeName)) {
                 if (JavaClassValidateUtil.isCollection(typeName)) {
                     typeName = typeName + "<T>";
@@ -1039,11 +1039,8 @@ public class SpringBootDocBuildTemplate implements IDocBuildTemplate<ApiDoc> {
         annotationsList.addAll(cls.getAnnotations());
         boolean flag = annotationsList.stream().anyMatch(item -> {
             String annotationName = item.getType().getValue();
-            if (DocAnnotationConstants.REQUEST_MAPPING.equals(annotationName) ||
-                    DocGlobalConstants.REQUEST_MAPPING_FULLY.equals(annotationName)) {
-                return true;
-            }
-            return false;
+            return DocAnnotationConstants.REQUEST_MAPPING.equals(annotationName) ||
+                    DocGlobalConstants.REQUEST_MAPPING_FULLY.equals(annotationName);
         });
         // child override parent set
         if (flag) {

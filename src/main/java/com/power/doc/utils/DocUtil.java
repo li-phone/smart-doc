@@ -412,7 +412,7 @@ public class DocUtil {
                         + "() - bad @" + tagName + " javadoc from " + javaMethod.getDeclaringClass()
                         .getCanonicalName() + ", This is an invalid comment.");
             }
-            if (DocTags.PARAM.equals(tagName)) {
+            if (DocTags.PARAM.equals(tagName) || DocTags.UPARAM.equals(tagName)) {
                 String pName = value;
                 String pValue = DocGlobalConstants.NO_COMMENTS_FOUND;
                 int idx = value.indexOf(" ");
